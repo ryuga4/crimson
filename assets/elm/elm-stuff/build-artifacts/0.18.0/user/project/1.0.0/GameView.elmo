@@ -1,0 +1,4 @@
+var _user$project$GameView$game = function (model) {
+	return _elm_lang$html$Html$text(
+		_elm_lang$core$Basics$toString(model.counter));
+};

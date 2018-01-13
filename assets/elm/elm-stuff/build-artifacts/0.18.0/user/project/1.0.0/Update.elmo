@@ -1,0 +1,177 @@
+var _user$project$Update$subscriptions = function (model) {
+	return A2(_fbonetti$elm_phoenix_socket$Phoenix_Socket$listen, model.phxSocket, _user$project$Model$PhoenixMsg);
+};
+var _user$project$Update$playerDecoder = A5(
+	_elm_lang$core$Json_Decode$map4,
+	_user$project$Model$Player,
+	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'x', _elm_lang$core$Json_Decode$float),
+	A2(_elm_lang$core$Json_Decode$field, 'y', _elm_lang$core$Json_Decode$float),
+	A2(_elm_lang$core$Json_Decode$field, 'hp', _elm_lang$core$Json_Decode$int));
+var _user$project$Update$mapDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_user$project$Model$Map,
+	A2(_elm_lang$core$Json_Decode$field, 'width', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'height', _elm_lang$core$Json_Decode$int));
+var _user$project$Update$gameStateDecoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_user$project$Model$GameState,
+	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'map', _user$project$Update$mapDecoder),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'players',
+		_elm_lang$core$Json_Decode$list(_user$project$Update$playerDecoder)));
+var _user$project$Update$roomDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_user$project$Model$Room,
+	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'members', _elm_lang$core$Json_Decode$int));
+var _user$project$Update$roomsDecoder = A2(
+	_elm_lang$core$Json_Decode$map,
+	_user$project$Model$Rooms,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'rooms',
+		_elm_lang$core$Json_Decode$list(_user$project$Update$roomDecoder)));
+var _user$project$Update$userParams = function (model) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'user_id',
+				_1: _elm_lang$core$Json_Encode$string(model.typedUserName)
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Update$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'PhoenixMsg':
+				var _p1 = A2(_fbonetti$elm_phoenix_socket$Phoenix_Socket$update, _p0._0, model.phxSocket);
+				var phxSocket = _p1._0;
+				var phxCmd = _p1._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{phxSocket: phxSocket}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Model$PhoenixMsg, phxCmd)
+				};
+			case 'JoinRoom':
+				var _p3 = _p0._0;
+				var newSocket = A4(
+					_fbonetti$elm_phoenix_socket$Phoenix_Socket$on,
+					'update',
+					A2(_elm_lang$core$Basics_ops['++'], 'rooms:', _p3),
+					_user$project$Model$UpdateGame,
+					_fbonetti$elm_phoenix_socket$Phoenix_Socket$withDebug(model.phxSocket));
+				var channel = A2(
+					_fbonetti$elm_phoenix_socket$Phoenix_Channel$withPayload,
+					_user$project$Update$userParams(model),
+					_fbonetti$elm_phoenix_socket$Phoenix_Channel$init(
+						A2(_elm_lang$core$Basics_ops['++'], 'rooms:', _p3)));
+				var _p2 = A2(_fbonetti$elm_phoenix_socket$Phoenix_Socket$join, channel, newSocket);
+				var phxSocket = _p2._0;
+				var phxCmd = _p2._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							phxSocket: phxSocket,
+							roomName: _elm_lang$core$Maybe$Just(_p3),
+							typedRoomName: '',
+							state: _user$project$Model$InGame
+						}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Model$PhoenixMsg, phxCmd)
+				};
+			case 'JoinMainChannel':
+				var channel = _fbonetti$elm_phoenix_socket$Phoenix_Channel$init('main');
+				var _p4 = A2(_fbonetti$elm_phoenix_socket$Phoenix_Socket$join, channel, model.phxSocket);
+				var phxSocket = _p4._0;
+				var phxCmd = _p4._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{phxSocket: phxSocket}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Model$PhoenixMsg, phxCmd)
+				};
+			case 'LeaveRoom':
+				var _p5 = model.roomName;
+				if (_p5.ctor === 'Nothing') {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				} else {
+					var _p7 = _p5._0;
+					var newSocket = A3(
+						_fbonetti$elm_phoenix_socket$Phoenix_Socket$off,
+						'update',
+						A2(_elm_lang$core$Basics_ops['++'], 'rooms:', _p7),
+						_fbonetti$elm_phoenix_socket$Phoenix_Socket$withDebug(model.phxSocket));
+					var _p6 = A2(
+						_fbonetti$elm_phoenix_socket$Phoenix_Socket$leave,
+						A2(_elm_lang$core$Basics_ops['++'], 'rooms:', _p7),
+						newSocket);
+					var phxSocket = _p6._0;
+					var phxCmd = _p6._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{phxSocket: phxSocket, roomName: _elm_lang$core$Maybe$Nothing, state: _user$project$Model$InMenu}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Model$PhoenixMsg, phxCmd)
+					};
+				}
+			case 'NoOp':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'UpdateRooms':
+				var _p8 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Update$roomsDecoder, _p0._0);
+				if (_p8.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{rooms: _p8._0.rooms}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+			case 'UpdateGame':
+				var _p9 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Update$gameStateDecoder, _p0._0);
+				if (_p9.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								gameState: _elm_lang$core$Maybe$Just(_p9._0),
+								counter: model.counter + 1
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+			case 'UpdateTypedRoomName':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{typedRoomName: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{typedUserName: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});

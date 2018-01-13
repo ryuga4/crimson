@@ -1,0 +1,8 @@
+var _user$project$View$view = function (model) {
+	var _p0 = model.state;
+	if (_p0.ctor === 'InMenu') {
+		return _user$project$MenuView$menu(model);
+	} else {
+		return _user$project$GameView$game(model);
+	}
+};

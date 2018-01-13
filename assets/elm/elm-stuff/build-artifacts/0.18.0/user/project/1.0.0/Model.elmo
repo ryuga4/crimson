@@ -1,0 +1,94 @@
+var _user$project$Model$socketServer = 'ws://localhost:4000/socket/websocket';
+var _user$project$Model$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {newMessage: a, messages: b, phxSocket: c, state: d, rooms: e, typedRoomName: f, roomName: g, typedUserName: h, userName: i, gameState: j, counter: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _user$project$Model$Room = F2(
+	function (a, b) {
+		return {name: a, members: b};
+	});
+var _user$project$Model$Rooms = function (a) {
+	return {rooms: a};
+};
+var _user$project$Model$Player = F4(
+	function (a, b, c, d) {
+		return {name: a, x: b, y: c, hp: d};
+	});
+var _user$project$Model$Map = F2(
+	function (a, b) {
+		return {width: a, height: b};
+	});
+var _user$project$Model$GameState = F3(
+	function (a, b, c) {
+		return {name: a, map: b, players: c};
+	});
+var _user$project$Model$UpdateRooms = function (a) {
+	return {ctor: 'UpdateRooms', _0: a};
+};
+var _user$project$Model$initPhxSocket = A4(
+	_fbonetti$elm_phoenix_socket$Phoenix_Socket$on,
+	'update_rooms',
+	'main',
+	_user$project$Model$UpdateRooms,
+	_fbonetti$elm_phoenix_socket$Phoenix_Socket$withDebug(
+		_fbonetti$elm_phoenix_socket$Phoenix_Socket$init(_user$project$Model$socketServer)));
+var _user$project$Model$UpdateTypedRoomName = function (a) {
+	return {ctor: 'UpdateTypedRoomName', _0: a};
+};
+var _user$project$Model$UpdateTypedUserName = function (a) {
+	return {ctor: 'UpdateTypedUserName', _0: a};
+};
+var _user$project$Model$NoOp = {ctor: 'NoOp'};
+var _user$project$Model$LeaveRoom = {ctor: 'LeaveRoom'};
+var _user$project$Model$UpdateGame = function (a) {
+	return {ctor: 'UpdateGame', _0: a};
+};
+var _user$project$Model$JoinMainChannel = {ctor: 'JoinMainChannel'};
+var _user$project$Model$JoinRoom = function (a) {
+	return {ctor: 'JoinRoom', _0: a};
+};
+var _user$project$Model$PhoenixMsg = function (a) {
+	return {ctor: 'PhoenixMsg', _0: a};
+};
+var _user$project$Model$InMenu = {ctor: 'InMenu'};
+var _user$project$Model$initModel = {
+	newMessage: '',
+	messages: {ctor: '[]'},
+	phxSocket: _user$project$Model$initPhxSocket,
+	state: _user$project$Model$InMenu,
+	rooms: {ctor: '[]'},
+	typedRoomName: '',
+	roomName: _elm_lang$core$Maybe$Nothing,
+	userName: _elm_lang$core$Maybe$Nothing,
+	typedUserName: '',
+	gameState: _elm_lang$core$Maybe$Nothing,
+	counter: 0
+};
+var _user$project$Model$init = {
+	ctor: '_Tuple2',
+	_0: _user$project$Model$initModel,
+	_1: A2(
+		_elm_lang$core$Task$perform,
+		_elm_lang$core$Basics$identity,
+		_elm_lang$core$Task$succeed(_user$project$Model$JoinMainChannel))
+};
+var _user$project$Model$InGame = {ctor: 'InGame'};
